@@ -1,33 +1,30 @@
+const express = require("express");
+const dotenv = require("dotenv");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const mongoose = require("mongoose");
 
-const { MongoClient} = require('mongodb');
-require('dotenv').config();
-const app = require('express')
+const app = express();
+dotenv.config();
 
-const exp = app()
-
-exp.get('/',((req,res)=>{
-    res.send("Hii")
-}))
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(process.env.URI);
-
-async function run() {
+// Database Connection
+const db_connect = async () => {
     try {
-        // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
-        // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
-        console.log(hii)
-    } finally {
-        // Ensures that the client will close when you finish/error
-        await client.close();
+        await mongoose.connect(process.env.URI);
+        console.log("Connected to MongoDB");
+    } catch (err) {
+        console.error("Failed to connect to MongoDB:", err);
+        process.exit(1); // Exit the application if unable to connect to the database
     }
-}
-run().catch(console.dir);
+};
 
-exp.listen(process.env.PORT,(()=>{
-    console.log("Server is activate of port 8080")
-}))
+// Middlewares
+app.use(cors());
+app.use(cookieParser());
+app.use(express.json());
 
-
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+    db_connect();
+    console.log("Server started on port", PORT);
+});
