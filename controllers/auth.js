@@ -4,7 +4,6 @@ const createError = require('../utils/error.js')
 const jwt = require('jsonwebtoken')
 const dotenv = require("dotenv");
 
-module.exports = {}
 dotenv.config()
 module.exports.register = async (req, res, next) => {
     try {
@@ -35,7 +34,7 @@ module.exports.login = async (req, res, next) => {
         const { password, isAdmin, ...otherDetails } = user._doc;
         res.cookie("access_token", token, {
             httpOnly: true,
-        }).status(200).json({details: {...otherDetails}, isAdmin}) 
+        }).status(200).json({details: {...otherDetails}, isAdmin, access_token: token}) 
     } catch (err){
         next(err)
     }
