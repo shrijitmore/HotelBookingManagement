@@ -2,8 +2,10 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs')
 const createError = require('../utils/error.js')
 const jwt = require('jsonwebtoken')
+const dotenv = require("dotenv");
 
 module.exports = {}
+dotenv.config()
 module.exports.register = async (req, res, next) => {
     try {
         const salt = bcrypt.genSaltSync(10);
@@ -12,10 +14,10 @@ module.exports.register = async (req, res, next) => {
             ...req.body,
             password: hash,
         });
-
+        await newUser.save();
         res.status(200).send("User Has Been Created")
     } catch (err){
-        next(error)
+        next(err)
     }
 }
 
@@ -28,7 +30,7 @@ module.exports.login = async (req, res, next) => {
         if (!isPasswordCorrect) return next(createError(403, 'Wrong Password'))
 
         // Sign JWT token
-        const token = jwt.sign({_id:user._id, isAdmin: user.isAdmin},process.env.JWT)
+        const token = jwt.sign({ _id: user._id, isAdmin: user.isAdmin }, process.env.JWTToken);
 
         const { password, isAdmin, ...otherDetails } = user._doc;
         res.cookie("access_token", token, {
