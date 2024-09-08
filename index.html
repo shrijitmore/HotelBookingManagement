@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Reservation System</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1,
+        h2 {
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input,
+        button {
+            margin: 5px 0;
+            padding: 5px;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        #response {
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        #hotelList {
+            margin-top: 20px;
+        }
+
+        .hotel-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Hotel Reservation System</h1>
+
+    <h2>Authentication</h2>
+    <form id="registerForm">
+        <h3>Register</h3>
+        <input type="text" id="registerUsername" placeholder="Username" required>
+        <input type="email" id="registerEmail" placeholder="Email" required>
+        <input type="password" id="registerPassword" placeholder="Password" required>
+        <input type="text" id="registerCountry" placeholder="Country">
+        <input type="text" id="registerCity" placeholder="City">
+        <input type="tel" id="registerPhone" placeholder="Phone">
+        <button type="submit">Register</button>
+    </form>
+
+    <form id="loginForm">
+        <h3>Login</h3>
+        <input type="text" id="loginUsername" placeholder="Username" required>
+        <input type="password" id="loginPassword" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
+
+    <h2>Hotel Management</h2>
+    <form id="createHotelForm">
+        <h3>Create Hotel</h3>
+        <input type="text" id="hotelName" placeholder="Hotel Name" required>
+        <input type="text" id="hotelType" placeholder="Hotel Type" required>
+        <input type="text" id="hotelCountry" placeholder="Country" required>
+        <input type="text" id="hotelCity" placeholder="City" required>
+        <input type="text" id="hotelAddress" placeholder="Address" required>
+        <input type="number" id="hotelDistance" placeholder="Distance from City Center" required>
+        <input type="text" id="hotelTitle" placeholder="Title" required>
+        <input type="text" id="hotelDescription" placeholder="Description" required>
+        <input type="number" id="hotelRating" placeholder="Rating" required>
+        <input type="number" id="hotelCheapestPrice" placeholder="Cheapest Price" required>
+        <button type="submit">Create Hotel</button>
+    </form>
+
+    <form id="removeHotelForm">
+        <h3>Remove Hotel</h3>
+        <input type="text" id="removeHotelId" placeholder="Hotel ID" required>
+        <button type="submit">Remove Hotel</button>
+    </form>
+
+    <h3>All Hotels</h3>
+    <button id="showAllHotelsBtn">Show All Hotels</button>
+    <div id="hotelList"></div>
+
+    <h2>Room Management</h2>
+    <form id="createRoomForm">
+        <h3>Create Room</h3>
+        <input type="text" id="roomHotelId" placeholder="Hotel ID" required>
+        <input type="text" id="roomTitle" placeholder="Room Title" required>
+        <input type="number" id="roomPrice" placeholder="Price" required>
+        <input type="number" id="roomMaxPeople" placeholder="Max People" required>
+        <input type="text" id="roomDescription" placeholder="Description" required>
+        <input type="text" id="roomNumbers" placeholder="Room Numbers (comma-separated)" required>
+        <button type="submit">Create Room</button>
+    </form>
+
+    <form id="updateRoomAvailabilityForm">
+        <h3>Update Room Availability</h3>
+        <input type="text" id="availabilityRoomId" placeholder="Room ID" required>
+        <input type="text" id="availabilityRoomNumber" placeholder="Room Number" required>
+        <input type="date" id="availabilityDate" required>
+        <button type="submit">Update Availability</button>
+    </form>
+
+    <div id="response"></div>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api';
+        const responseDiv = document.getElementById('response');
+        const hotelListDiv = document.getElementById('hotelList');
+
+        // Helper function to make API calls
+        async function apiCall(method, endpoint, data = null) {
+            try {
+                const token = localStorage.getItem('token');
+                const headers = token ? { Authorization: `Bearer ${token}` } : {};
+                const response = await axios({
+                    method,
+                    url: `${API_URL}${endpoint}`,
+                    data,
+                    headers
+                });
+                responseDiv.innerText = JSON.stringify(response.data, null, 2);
+                return response.data;
+            } catch (error) {
+                responseDiv.innerText = `Error: ${error.response?.data?.message || error.message}`;
+                throw error;
+            }
+        }
+
+        // Event listeners for forms
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const country = document.getElementById('registerCountry').value;
+            const city = document.getElementById('registerCity').value;
+            const phone = document.getElementById('registerPhone').value;
+            await apiCall('post', '/auth/register', { username, email, password, country, city, phone });
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            try {
+                const response = await axios.post(`${API_URL}/auth/login`, { username, password });
+                if (response && response.data) {
+                    alert('Login successful!');
+                    responseDiv.innerText = JSON.stringify(response.data, null, 2);
+                    // Store the token in localStorage for future authenticated requests
+                    localStorage.setItem('token', response.data.token);
+                } else {
+                    console.log('Login response:', response);
+                    alert('Login failed. Please check your credentials.');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                responseDiv.innerText = `Error: ${error.response?.data?.message || error.message}`;
+                alert('Login failed: ' + (error.response?.data?.message || 'An error occurred'));
+            }
+        });
+
+        document.getElementById('createHotelForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const hotelData = {
+                name: document.getElementById('hotelName').value,
+                type: document.getElementById('hotelType').value,
+                country: document.getElementById('hotelCountry').value,
+                city: document.getElementById('hotelCity').value,
+                address: document.getElementById('hotelAddress').value,
+                distance: document.getElementById('hotelDistance').value,
+                title: document.getElementById('hotelTitle').value,
+                desc: document.getElementById('hotelDescription').value,
+                rating: document.getElementById('hotelRating').value,
+                cheapestPrice: document.getElementById('hotelCheapestPrice').value
+            };
+            try {
+                await apiCall('post', '/hotels', hotelData);
+                alert('Hotel created successfully!');
+            } catch (error) {
+                console.error('Error creating hotel:', error);
+                alert('Failed to create hotel. Please check your input and try again.');
+            }
+        });
+
+        document.getElementById('removeHotelForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const hotelId = document.getElementById('removeHotelId').value;
+            try {
+                await apiCall('delete', `/hotels/${hotelId}`);
+                alert('Hotel removed successfully!');
+            } catch (error) {
+                console.error('Error removing hotel:', error);
+                alert('Failed to remove hotel. Please check the hotel ID and try again.');
+            }
+        });
+
+        document.getElementById('createRoomForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const hotelId = document.getElementById('roomHotelId').value;
+            const roomNumbers = document.getElementById('roomNumbers').value.split(',').map(num => ({ number: num.trim() }));
+            const roomData = {
+                title: document.getElementById('roomTitle').value,
+                price: document.getElementById('roomPrice').value,
+                maxPeople: document.getElementById('roomMaxPeople').value,
+                desc: document.getElementById('roomDescription').value,
+                roomNumbers: roomNumbers
+            };
+            try {
+                await apiCall('post', `/rooms/${hotelId}`, roomData);
+                alert('Room created successfully!');
+            } catch (error) {
+                console.error('Error creating room:', error);
+                alert('Failed to create room. Please check your input and try again.');
+            }
+        });
+
+        document.getElementById('updateRoomAvailabilityForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const roomId = document.getElementById('availabilityRoomId').value;
+            const roomNumber = document.getElementById('availabilityRoomNumber').value;
+            const dates = [document.getElementById('availabilityDate').value];
+            try {
+                await apiCall('put', `/rooms/availability/${roomId}`, { number: roomNumber, dates });
+                alert('Room availability updated successfully!');
+            } catch (error) {
+                console.error('Error updating room availability:', error);
+                alert('Failed to update room availability. Please check your input and try again.');
+            }
+        });
+
+        document.getElementById('showAllHotelsBtn').addEventListener('click', async () => {
+            try {
+                const hotels = await apiCall('get', '/hotels');
+                displayHotels(hotels);
+            } catch (error) {
+                console.error('Error fetching hotels:', error);
+                alert('Failed to fetch hotels. Please try again later.');
+            }
+        });
+
+        function displayHotels(hotels) {
+            hotelListDiv.innerHTML = '';
+            hotels.forEach(hotel => {
+                const hotelElement = document.createElement('div');
+                hotelElement.className = 'hotel-item';
+                hotelElement.innerHTML = `
+                    <h4>${hotel.name}</h4>
+                    <p>Type: ${hotel.type}</p>
+                    <p>Location: ${hotel.city}, ${hotel.country}</p>
+                    <p>Address: ${hotel.address}</p>
+                    <p>Distance from City Center: ${hotel.distance}</p>
+                    <p>Title: ${hotel.title}</p>
+                    <p>Description: ${hotel.desc}</p>
+                    <p>Rating: ${hotel.rating}</p>
+                    <p>Cheapest Price: $${hotel.cheapestPrice}</p>
+                `;
+                hotelListDiv.appendChild(hotelElement);
+            });
+        }
+    </script>
+</body>
+
+</html>
