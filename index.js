@@ -5,6 +5,8 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const userRoutes = require("./routes/user.js");
 const authRoutes = require("./routes/auth.js");
+const hotelsRoutes = require("./routes/hotels.js");
+const roomRoutes = require("./routes/rooms.js");
 
 const app = express();
 dotenv.config();
@@ -27,6 +29,8 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes)
 app.use("/api/users", userRoutes)
+app.use("/api/hotels", hotelsRoutes)
+app.use("/api/rooms", roomRoutes)
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

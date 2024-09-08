@@ -1,30 +1,28 @@
-import { required } from "nodemon/lib/config"
-
 const mongoose = require("mongoose")
 
 
-const RoomsSchema = new mongoose.Schema(
+const RoomSchema = new mongoose.Schema(
     {
         title: {
             type: String,
             required: true,
         },
-        price : {
+        price: {
             type: Number,
             required: true,
         },
         maxPeople: {
+            type: Number,
+            required: true
+        },
+        desc: {
             type: String,
             required: true
         },
-        desc : {
-            type: String,
-            required: true
-        },
-        roomNumbers:[{
-            number : Number,
+        roomNumbers: [{
+            number: Number,
             unavailableDates: {
-                type: [Dates]
+                type: [Date]
             }
         }],
     },
@@ -33,4 +31,4 @@ const RoomsSchema = new mongoose.Schema(
     }
 )
 
-module.exports = mongoose.model('Rooms', RoomsSchema)
+module.exports = mongoose.model('Room', RoomSchema)
