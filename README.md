@@ -1,55 +1,92 @@
 # Hotel Reservation System (Node JS, mongoDB, Express JS)
 
-The Hotel Reservation System is an advanced web application designed to streamline hotel management and booking processes. Built on the MERN (MongoDB, Express.js, React.js, Node.js) stack, this project caters to both administrators and customers, providing a user-friendly interface and a comprehensive set of features.
+# Hotel Reservation System (Node.js, MongoDB, Express.js)
 
-## Core Features
+The Hotel Reservation System is a robust backend application designed to manage hotel operations and bookings. Built using Node.js, Express.js, and MongoDB, this project provides a comprehensive set of APIs for hotel management and reservation processes.
 
-1. **User Authentication and Authorization:**
-   - Secure user authentication and role-based access control ensure the integrity of the system.
-   - Users can register accounts and log in securely, with distinct roles assigned to administrators and customers.
+## Project Structure
 
-2. **Browse and Search Functionality:**
-   - Customers can easily search for available rooms based on various criteria such as location, date, room type, and amenities.
-   - Advanced search options enable users to refine their search results according to their preferences.
+1. **Server Setup**
+   - The main `index.js` file initializes the Express server and connects to MongoDB.
+   - Middleware such as `cors`, `cookieParser`, and `express.json()` are configured.
+   - API routes are defined and connected to their respective route handlers.
 
-3. **Booking Management:**
-   - Customers can view real-time room availability and make reservations for their desired dates.
-   - Automated updates keep customers informed about changes in availability or booking status.
+2. **Database Models**
+   - `Hotel.js`: Defines the schema for hotel information including name, type, location, rooms, and pricing.
+   - `Room.js`: Outlines the structure for room data, including title, price, capacity, and availability dates.
+   - `User.js`: (Not shown in the context, but likely exists) Would define user data structure for authentication.
 
-4. **Admin Dashboard:**
-   - Administrators have access to a dedicated dashboard for efficiently managing hotel operations.
-   - Admins can add, edit, or remove room listings, update pricing, and oversee bookings.
-   - Comprehensive analytics and reporting tools provide valuable insights into occupancy rates, revenue, and other key metrics.
+3. **API Routes**
+   - `auth.js`: Handles user authentication routes (login, register).
+   - `user.js`: Manages user-related operations.
+   - `hotels.js`: Deals with hotel CRUD operations and searches.
+   - `rooms.js`: Handles room-related operations including creation and availability updates.
 
-5. **Reviews and Ratings:**
-   - Customers can leave reviews and ratings based on their hotel experiences, contributing to the overall guest feedback.
-   - Admins can moderate reviews and respond to customer feedback to maintain service quality.
+4. **Controllers**
+   - `room.js`: Contains logic for room operations such as:
+     - `createRoom`: Adds a new room to a specific hotel.
+     - `updateRoomAvailability`: Updates the availability of a room for specific dates.
 
-6. **Email Notifications:**
-   - Automated email notifications keep customers updated about booking confirmations, changes in booking status, and other relevant information.
-   - Reminder emails can be sent closer to the check-in date to ensure a smooth guest experience.
+5. **Error Handling**
+   - A custom error handling utility is implemented in `utils/error.js`.
+   - Controllers use this utility to create and pass errors to the next middleware.
 
-7. **Responsive Design:**
-   - The application features a responsive design, offering optimal user experience across various devices including desktops, tablets, and smartphones.
+## Key Features
 
-## Technology Stack
+1. **Hotel Management**
+   - Add, update, delete, and retrieve hotel information.
+   - Associate rooms with specific hotels.
 
-- **Frontend:** React.js for building a dynamic and intuitive user interface.
-- **Backend:** Node.js and Express.js for robust server-side logic and API development.
-- **Database:** MongoDB for flexible and scalable data storage.
-- **Authentication:** Implementation of secure authentication mechanisms using libraries like Passport.js or JSON Web Tokens (JWT).
-- **Deployment:** Utilization of Docker for containerization, facilitating deployment to popular cloud platforms like AWS, Azure, or Google Cloud.
+2. **Room Management**
+   - Create rooms for hotels with details like price, capacity, and description.
+   - Manage room availability for specific dates.
+
+3. **Booking System**
+   - Allow users to check room availability for desired dates.
+   - Process room bookings and update availability accordingly.
+
+4. **User Authentication**
+   - Secure routes using authentication middleware.
+   - Implement user registration and login functionality.
+
+5. **Error Handling**
+   - Centralized error handling for consistent error responses across the API.
 
 ## Getting Started
 
-To get started with the Hotel Reservation System project, follow these steps:
+To set up and run this Hotel Reservation System backend:
 
-1. Clone this repository to your local machine.
-2. Install dependencies for both the frontend and backend.
-3. Set up your MongoDB database and configure the connection.
-4. Run the backend server using Node.js.
-5. Start the frontend development server to access the application.
+1. Clone the repository to your local machine.
+2. Install dependencies by running `npm install` in the project root.
+3. Create a `.env` file in the root directory and add the following:
+   ```
+   PORT=3000
+   URI=your_mongodb_connection_string
+   ```
+4. Start the server by running `node index.js` or `npm start` (if configured in package.json).
+
+## API Endpoints
+
+- **Auth:**
+  - POST `/api/auth/register`: Register a new user
+  - POST `/api/auth/login`: User login
+
+- **Hotels:**
+  - GET `/api/hotels`: Retrieve all hotels
+  - POST `/api/hotels`: Add a new hotel
+  - GET `/api/hotels/:id`: Get a specific hotel
+  - PUT `/api/hotels/:id`: Update a hotel
+  - DELETE `/api/hotels/:id`: Delete a hotel
+
+- **Rooms:**
+  - POST `/api/rooms/:hotelid`: Create a new room for a specific hotel
+  - PUT `/api/rooms/availability/:id`: Update room availability
+
+- **Users:** (Endpoints not shown in context, but likely include)
+  - GET `/api/users/:id`: Get user information
+  - PUT `/api/users/:id`: Update user information
+  - DELETE `/api/users/:id`: Delete a user
 
 ## Conclusion
 
-The Hotel Reservation System developed on the MERN stack offers a comprehensive solution for hotel management, focusing on efficiency and user satisfaction. By incorporating advanced features and adhering to best practices in web development, the system aims to enhance the overall guest experience while simplifying administrative tasks for hotel staff.
+This Node.js-based Hotel Reservation System backend provides a solid foundation for managing hotel operations, room bookings, and user interactions. It offers scalability and flexibility, allowing for easy integration with various frontend applications or expansion of features as needed.
