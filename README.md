@@ -1,5 +1,3 @@
-# Hotel Reservation System (Node JS, mongoDB, Express JS)
-
 # Hotel Reservation System (Node.js, MongoDB, Express.js)
 
 The Hotel Reservation System is a robust backend application designed to manage hotel operations and bookings. Built using Node.js, Express.js, and MongoDB, this project provides a comprehensive set of APIs for hotel management and reservation processes.
